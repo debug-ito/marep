@@ -8,8 +8,6 @@ module Data.MaRep
        ( replaceAll
        ) where
 
-import Data.Monoid (Monoid(..))
-
 import Data.MaRep.Zipper (Decomposable(..))
 
 -- | Match all substrings in the input string with the matcher
@@ -26,7 +24,7 @@ import Data.MaRep.Zipper (Decomposable(..))
 --
 -- The match-and-replace is performed on non-overlapping substrings of
 -- the input string. Replacement results are not matched again.
-replaceAll :: (Monoid a, Decomposable a)
+replaceAll :: Decomposable a
            => (a -> Maybe a)
               -- ^ The matcher function. The argument is a substring
               -- of the input string. It should return 'Just' if the
