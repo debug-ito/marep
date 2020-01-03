@@ -35,21 +35,26 @@ instance Decomposable [a] where
       Just (rrest, rbottom) -> Just ([x] ++ rrest, rbottom)
   isEmpty = List.null
 
--- | One-dimensional zipper over a sequence with a cursor.
+-- | One-dimensional zipper over a string with a cursor.
 --
--- The cursor can span zero or more elements in the sequence. Inside
--- the zipper, the sequence type @a@ is treated like it's
--- non-empty. If the span of the cursor is zero, it's 'Nothing'.
+-- The cursor can span zero or more elements in the string. Inside the
+-- zipper, the string type @a@ is treated like it's non-empty. If an
+-- empty part is expressed as 'Nothing'.
 data Zipper a =
-    ZEmpty -- ^ The input sequence is empty.
-  | ZTop (Maybe a) a -- ^ The cursor is at the top. Keeps the cursor and the bottom part.
-  | ZMiddle a (Maybe a) a -- ^ The cursor is at the middle. Keeps the top, cursor and bottom part.
-  | ZBottom a (Maybe a) -- ^ The cursor is at the bottom. Keeps the top part and cursor.
+  Zipper
+  { zipTop :: Maybe a, -- ^ the top part
+    zipCursor :: Maybe a, -- ^ the cursor
+    zipBottom :: Maybe a -- ^ the bottom part
+  }
+  deriving (Show,Eq,Ord,Functor)
+
+toMaybe :: Decomposable a => a -> Maybe a
+toMaybe s = if isEmpty s then Nothing else Just s
 
 -- | Init a zipper with the cursor being empty at the top.
 initTop :: Decomposable a => a -> Zipper a
-initTop s = if isEmpty s then ZEmpty else ZTop Nothing s
+initTop s = Zipper Nothing Nothing (toMaybe s)
 
 -- | Init a zipper with the cursor being empty at the bottom.
 initBottom :: Decomposable a => a -> Zipper a
-initBottom s = if isEmpty s then ZEmpty else ZBottom s Nothing
+initBottom s = Zipper (toMaybe s) Nothing Nothing
