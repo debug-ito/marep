@@ -4,9 +4,9 @@ author:                 Toshio Ito <debug.ito@gmail.com>
 maintainer:             Toshio Ito <debug.ito@gmail.com>
 license:                BSD3
 license-file:           LICENSE
--- synopsis:               
--- description:            
--- category:               
+synopsis:               Simple match-and-replace utility for lists and texts with light-weight dependency
+description:            MaRep is a simple match-and-replace utility for lists, strings and texts with light-weight dependency. See "Data.MaRep" for detail.
+category:               Algorithms
 cabal-version:          >= 1.10
 build-type:             Simple
 extra-source-files:     README.md, ChangeLog.md
