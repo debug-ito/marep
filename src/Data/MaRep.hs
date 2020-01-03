@@ -5,10 +5,14 @@
 --
 -- TODO: add documents. mention parsec, regex, pcre-light
 module Data.MaRep
-       ( replaceAll
+       ( replaceAll,
+         Decomposable(..)
        ) where
 
-import Data.MaRep.Zipper (Decomposable(..))
+import Data.MaRep.Zipper
+  ( Decomposable(..),
+    Zipper(..), initTop
+  )
 
 -- | Match all substrings in the input string with the matcher
 -- function, replace the matched substrings with the result of the
@@ -24,6 +28,17 @@ import Data.MaRep.Zipper (Decomposable(..))
 --
 -- The match-and-replace is performed on non-overlapping substrings of
 -- the input string. Replacement results are not matched again.
+--
+-- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) ""
+-- ""
+-- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) "uuu"
+-- "uuu"
+-- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) "uffu"
+-- "uffffffu"
+-- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) "fuuf"
+-- "fffuufff"
+-- >>> replaceAll (\x -> case x of "f" -> Just "fff"; "go" -> Just "gg"; "hii" -> Just "H"; _ -> Nothing) "gfgoihgfhiig"
+-- "gfffggihgfffHg"
 replaceAll :: Decomposable a
            => (a -> Maybe a)
               -- ^ The matcher function. The argument is a substring
