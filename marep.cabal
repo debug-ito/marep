@@ -18,9 +18,9 @@ library
   hs-source-dirs:       src
   ghc-options:          -Wall -fno-warn-unused-imports
   default-extensions:   OverloadedStrings, StrictData
-  -- other-extensions:     
+  other-extensions:     DeriveFunctor
   exposed-modules:      Data.MaRep
-  -- other-modules:        
+  other-modules:        Data.MaRep.Zipper
   build-depends:        base
 
 -- executable marep
