@@ -9,6 +9,8 @@ module Data.MaRep
          Decomposable(..)
        ) where
 
+import Data.Semigroup (Semigroup((<>)))
+
 import Data.MaRep.Zipper
   ( Decomposable(..),
     Zipper(..), initTop
@@ -29,17 +31,17 @@ import Data.MaRep.Zipper
 -- The match-and-replace is performed on non-overlapping substrings of
 -- the input string. Replacement results are not matched again.
 --
--- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) ""
+-- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) ("" :: String)
 -- ""
--- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) "uuu"
+-- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) ("uuu" :: String)
 -- "uuu"
--- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) "uffu"
+-- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) ("uffu" :: String)
 -- "uffffffu"
--- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) "fuuf"
+-- >>> replaceAll (\x -> if x == "f" then Just "fff" else Nothing) ("fuuf" :: String)
 -- "fffuufff"
--- >>> replaceAll (\x -> case x of "f" -> Just "fff"; "go" -> Just "gg"; "hii" -> Just "H"; _ -> Nothing) "gfgoihgfhiig"
+-- >>> replaceAll (\x -> case x of "f" -> Just "fff"; "go" -> Just "gg"; "hii" -> Just "H"; _ -> Nothing) ("gfgoihgfhiig" :: String)
 -- "gfffggihgfffHg"
-replaceAll :: Decomposable a
+replaceAll :: (Decomposable a, Semigroup a)
            => (a -> Maybe a)
               -- ^ The matcher function. The argument is a substring
               -- of the input string. It should return 'Just' if the
@@ -47,8 +49,42 @@ replaceAll :: Decomposable a
               -- of replacement.
            -> a -- ^ Input string
            -> a -- ^ Result of match-and-replace
-replaceAll = undefined
+replaceAll matcher input =
+  case maRepStart matcher input of
+    Nothing -> input
+    Just (rep, mbottom) ->
+      case fmap (replaceAll matcher) mbottom of
+        Nothing -> rep
+        Just rest -> rep <> rest
 
+-- | Match and replace once from the start of the input string. If
+-- match is found, it returns the replacement result and the zipper at
+-- that moment.
+matchStart :: (Decomposable a, Semigroup a)
+           => (a -> Maybe b) -- ^ The matcher against non-empty substrings
+           -> a -- ^ The input string
+           -> Maybe (b, Zipper a)
+matchStart = undefined
+
+-- | Like 'matchStart', but this one concatenates the replacement
+-- results to other parts. If match is found, it returns
+-- (concatenation of top part and replacement, bottom part if any).
+maRepStart :: Decomposable a
+           => (a -> Maybe a)
+           -> a
+           -> Maybe (a, Maybe a)
+maRepStart = undefined
+
+-- | Starting from the zipper, apply the matcher against the cursor
+-- repeatedly by enlarging the span of the cursor until it reaches the
+-- end of the string. If match is found, it returns the replacement
+-- result and the zipper of that moment. If match is not found, it
+-- returns 'Nothing'.
+matchLonger :: Decomposable a
+            => (a -> Maybe b) -- ^ The matcher
+            -> Zipper a -- ^ Starting zipper
+            -> Maybe (b, Zipper a)
+matchLonger = undefined
 
 -- TODO
 --

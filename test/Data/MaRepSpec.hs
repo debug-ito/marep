@@ -4,6 +4,7 @@ module Data.MaRepSpec (main, spec) where
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BSL
 import Data.Proxy (Proxy(..))
+import Data.Semigroup (Semigroup)
 import Data.String (IsString)
 import Data.Text (Text)
 import qualified Data.Text.Lazy as TL
@@ -23,7 +24,7 @@ spec = do
     -- specString "strict ByteString" (Proxy :: Proxy ByteString)
     -- specString "lazy ByteString" (Proxy :: Proxy BSL.ByteString)
 
-specString :: forall str . (IsString str, Decomposable str, Show str, Eq str)
+specString :: forall str . (IsString str, Decomposable str, Show str, Eq str, Semigroup str)
            => String -- ^ Type name
            -> Proxy str -- ^ specifies the string type
            -> Spec
