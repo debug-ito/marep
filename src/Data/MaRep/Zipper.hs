@@ -13,17 +13,33 @@ module Data.MaRep.Zipper
   ) where
 
 import qualified Data.List as List
+import Data.Monoid (Monoid(..))
 
 -- | Types that can be decomposed at the top or bottom.
-class Decomposable a where
+--
+-- 'mempty' cannot be decomposed.
+--
+-- prop> removeTop mempty == Nothing
+-- prop> removeBottom mempty == Nothing
+--
+-- Decomposed elements can be put back by 'mappend'.
+--
+-- prop> case removeTop x    of Nothing -> x == mempty ; Just (a, b) -> x == a `mappend` b && a /= mempty
+-- prop> case removeBottom x of Nothing -> x == mempty ; Just (a, b) -> x == a `mappend` b && b /= mempty
+class Monoid a => Decomposable a where
   -- | Decompose the top of the input data. The result is (top
   -- element, rest). It returns 'Nothing' if the input data is empty.
   removeTop :: a -> Maybe (a, a)
   -- | Decompose the bottom of the input data. The result is (rest,
   -- bottom element). It returns 'Nothing' if the input data is empty.
   removeBottom :: a -> Maybe (a, a)
-  -- | Return 'True' is the input is empty.
-  isEmpty :: a -> Bool
+
+-- Implementation note:
+--
+-- We don't support non-Monoid strings (like Data.List.NonEmpty) for
+-- Decomposable and MaRep operations. Decomposable instance for
+-- NonEmpty would be possible, but if we allowed it, we could not
+-- specify almost any property about Decomposable methods.
 
 instance Decomposable [a] where
   removeTop [] = Nothing
@@ -33,28 +49,22 @@ instance Decomposable [a] where
     case removeBottom rest of
       Nothing -> Just ([], [x])
       Just (rrest, rbottom) -> Just ([x] ++ rrest, rbottom)
-  isEmpty = List.null
 
 -- | One-dimensional zipper over a string with a cursor.
 --
--- The cursor can span zero or more elements in the string. Inside the
--- zipper, the string type @a@ is treated like it's non-empty. If an
--- empty part is expressed as 'Nothing'.
+-- The cursor can span zero or more elements in the string.
 data Zipper a =
   Zipper
-  { zipTop :: Maybe a, -- ^ the top part
-    zipCursor :: Maybe a, -- ^ the cursor
-    zipBottom :: Maybe a -- ^ the bottom part
+  { zipTop :: a, -- ^ the top part
+    zipCursor :: a, -- ^ the cursor
+    zipBottom :: a -- ^ the bottom part
   }
   deriving (Show,Eq,Ord,Functor)
 
-toMaybe :: Decomposable a => a -> Maybe a
-toMaybe s = if isEmpty s then Nothing else Just s
-
 -- | Init a zipper with the cursor being empty at the top.
 initTop :: Decomposable a => a -> Zipper a
-initTop s = Zipper Nothing Nothing (toMaybe s)
+initTop s = Zipper mempty mempty s
 
 -- | Init a zipper with the cursor being empty at the bottom.
 initBottom :: Decomposable a => a -> Zipper a
-initBottom s = Zipper (toMaybe s) Nothing Nothing
+initBottom s = Zipper s mempty mempty

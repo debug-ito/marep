@@ -21,8 +21,7 @@ library
   other-extensions:     DeriveFunctor
   exposed-modules:      Data.MaRep
   other-modules:        Data.MaRep.Zipper
-  build-depends:        base,
-                        semigroups
+  build-depends:        base
 
 -- executable marep
 --   default-language:     Haskell2010
@@ -43,7 +42,7 @@ test-suite spec
   default-extensions:   OverloadedStrings, StrictData
   other-extensions:     ScopedTypeVariables
   other-modules:        Data.MaRepSpec
-  build-depends:        base, marep, text, bytestring, semigroups,
+  build-depends:        base, marep, text, bytestring,
                         hspec
 
 test-suite doctest

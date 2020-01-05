@@ -9,7 +9,7 @@ module Data.MaRep
          Decomposable(..)
        ) where
 
-import Data.Semigroup (Semigroup((<>)))
+import Data.Monoid (Monoid, (<>))
 
 import Data.MaRep.Zipper
   ( Decomposable(..),
@@ -41,12 +41,12 @@ import Data.MaRep.Zipper
 -- "fffuufff"
 -- >>> replaceAll (\x -> case x of "f" -> Just "fff"; "go" -> Just "gg"; "hii" -> Just "H"; _ -> Nothing) ("gfgoihgfhiig" :: String)
 -- "gfffggihgfffHg"
-replaceAll :: (Decomposable a, Semigroup a)
+replaceAll :: Decomposable a
            => (a -> Maybe a)
-              -- ^ The matcher function. The argument is a substring
-              -- of the input string. It should return 'Just' if the
-              -- substring is matched. Content of 'Just' is the result
-              -- of replacement.
+              -- ^ The matcher function. The argument is a non-empty
+              -- substring of the input string. It should return
+              -- 'Just' if the substring is matched. Content of 'Just'
+              -- is the result of replacement.
            -> a -- ^ Input string
            -> a -- ^ Result of match-and-replace
 replaceAll matcher input =
@@ -60,7 +60,7 @@ replaceAll matcher input =
 -- | Match and replace once from the start of the input string. If
 -- match is found, it returns the replacement result and the zipper at
 -- that moment.
-matchStart :: (Decomposable a, Semigroup a)
+matchStart :: Decomposable a
            => (a -> Maybe b) -- ^ The matcher against non-empty substrings
            -> a -- ^ The input string
            -> Maybe (b, Zipper a)
