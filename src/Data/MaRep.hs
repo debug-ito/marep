@@ -13,7 +13,7 @@ import Data.Monoid (Monoid, (<>))
 
 import Data.MaRep.Zipper
   ( Decomposable(..),
-    Zipper(..), initTop
+    Zipper(..), initTop, moveNext, enlargeEnd
   )
 
 -- | Match all substrings in the input string with the matcher
@@ -52,10 +52,10 @@ replaceAll :: Decomposable a
 replaceAll matcher input =
   case maRepStart matcher input of
     Nothing -> input
-    Just (rep, mbottom) ->
-      case fmap (replaceAll matcher) mbottom of
-        Nothing -> rep
-        Just rest -> rep <> rest
+    Just (rep, bottom) ->
+      if isEmpty bottom
+      then rep
+      else rep <> replaceAll matcher bottom
 
 -- | Match and replace once from the start of the input string. If
 -- match is found, it returns the replacement result and the zipper at
@@ -64,16 +64,26 @@ matchStart :: Decomposable a
            => (a -> Maybe b) -- ^ The matcher against non-empty substrings
            -> a -- ^ The input string
            -> Maybe (b, Zipper a)
-matchStart = undefined
+matchStart matcher input = go $ initTop input  -- TODO: oops. we have to start with one-element long cursor.
+  where
+    go z =
+      case matchLonger matcher z of
+        Just result -> Just result
+        Nothing ->
+          case moveNext z of -- TODO: we have to ensure one-element long cursor
+            Just next_z -> go next_z
+            Nothing -> Nothing
 
 -- | Like 'matchStart', but this one concatenates the replacement
 -- results to other parts. If match is found, it returns
--- (concatenation of top part and replacement, bottom part if any).
+-- (concatenation of top part and replacement, bottom part).
 maRepStart :: Decomposable a
            => (a -> Maybe a)
            -> a
-           -> Maybe (a, Maybe a)
-maRepStart = undefined
+           -> Maybe (a, a)
+maRepStart matcher input = fmap concatRep $ matchStart matcher input
+  where
+    concatRep (rep, z) = (zipTop z <> rep, zipBottom z)
 
 -- | Starting from the zipper, apply the matcher against the cursor
 -- repeatedly by enlarging the span of the cursor until it reaches the
@@ -84,7 +94,15 @@ matchLonger :: Decomposable a
             => (a -> Maybe b) -- ^ The matcher
             -> Zipper a -- ^ Starting zipper
             -> Maybe (b, Zipper a)
-matchLonger = undefined
+matchLonger matcher init_z = go init_z
+  where
+    go z =
+      case matcher $ zipCursor z of
+        Just rep -> Just (rep, z)
+        Nothing ->
+          case enlargeEnd z of
+            Just next_z -> go next_z
+            Nothing -> Nothing
 
 -- TODO
 --

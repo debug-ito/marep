@@ -9,10 +9,13 @@ module Data.MaRep.Zipper
   ( Decomposable(..),
     Zipper(..),
     initTop,
-    initBottom
+    initBottom,
+    moveNext,
+    enlargeEnd
   ) where
 
 import qualified Data.List as List
+import Data.Maybe (isNothing)
 import Data.Monoid (Monoid(..))
 
 -- | Types that can be decomposed at the top or bottom.
@@ -21,6 +24,7 @@ import Data.Monoid (Monoid(..))
 --
 -- prop> removeTop    (mempty :: String) == Nothing
 -- prop> removeBottom (mempty :: String) == Nothing
+-- prop> isEmpty (mempty :: String) == True
 --
 -- Decomposed elements can be put back by 'mappend'.
 --
@@ -33,6 +37,9 @@ class Monoid a => Decomposable a where
   -- | Decompose the bottom of the input data. The result is (rest,
   -- bottom element). It returns 'Nothing' if the input data is empty.
   removeBottom :: a -> Maybe (a, a)
+  -- | Return 'True' if the input is empty.
+  isEmpty :: a -> Bool
+  isEmpty = isNothing . removeTop
 
 -- Implementation note:
 --
@@ -68,3 +75,12 @@ initTop s = Zipper mempty mempty s
 -- | Init a zipper with the cursor being empty at the bottom.
 initBottom :: Decomposable a => a -> Zipper a
 initBottom s = Zipper s mempty mempty
+
+-- | Move the cursor by one element towards the end. The cursor span
+-- is reset to zero.
+moveNext :: Decomposable a => Zipper a -> Maybe (Zipper a)
+moveNext = undefined -- TODO
+
+-- | Enlarge the cursor by one element by moving its end.
+enlargeEnd :: Decomposable a => Zipper a -> Maybe (Zipper a)
+enlargeEnd = undefined -- TODO
