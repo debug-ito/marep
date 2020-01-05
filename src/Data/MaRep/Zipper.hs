@@ -19,13 +19,13 @@ import Data.Monoid (Monoid(..))
 --
 -- 'mempty' cannot be decomposed.
 --
--- prop> removeTop mempty == Nothing
--- prop> removeBottom mempty == Nothing
+-- prop> removeTop    (mempty :: String) == Nothing
+-- prop> removeBottom (mempty :: String) == Nothing
 --
 -- Decomposed elements can be put back by 'mappend'.
 --
--- prop> case removeTop x    of Nothing -> x == mempty ; Just (a, b) -> x == a `mappend` b && a /= mempty
--- prop> case removeBottom x of Nothing -> x == mempty ; Just (a, b) -> x == a `mappend` b && b /= mempty
+-- prop> case removeTop x    of Nothing -> x == mempty ; Just (a, b) -> x == a `mappend` b && a /= mempty  (x :: String)
+-- prop> case removeBottom x of Nothing -> x == mempty ; Just (a, b) -> x == a `mappend` b && b /= mempty  (x :: String)
 class Monoid a => Decomposable a where
   -- | Decompose the top of the input data. The result is (top
   -- element, rest). It returns 'Nothing' if the input data is empty.

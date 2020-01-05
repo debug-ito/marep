@@ -54,7 +54,8 @@ test-suite doctest
   default-extensions:   OverloadedStrings, StrictData
   build-depends:        base,
                         doctest >=0.13,
-                        doctest-discover >=0.1.0.7
+                        doctest-discover >=0.1.0.7,
+                        QuickCheck
 
 source-repository head
   type:                 git
