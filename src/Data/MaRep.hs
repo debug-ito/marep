@@ -49,13 +49,15 @@ replaceAll :: Decomposable a
               -- is the result of replacement.
            -> a -- ^ Input string
            -> a -- ^ Result of match-and-replace
-replaceAll matcher input =
-  case maRepStart matcher input of
-    Nothing -> input
-    Just (rep, bottom) ->
-      if isEmpty bottom
-      then rep
-      else rep <> replaceAll matcher bottom
+replaceAll = undefined
+-- replaceAll matcher input =
+--   case maRepStart matcher input of
+--     Nothing -> input
+--     Just (rep, bottom) ->
+--       if isEmpty bottom
+--       then rep
+--       else rep <> replaceAll matcher bottom
+
 
 -- | Match and replace once from the start of the input string. If
 -- match is found, it returns the replacement result and the zipper at
